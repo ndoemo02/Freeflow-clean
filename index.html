@@ -1,163 +1,215 @@
 <!doctype html>
 <html lang="pl">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>FreeFlow — Voice to Order</title>
-  <meta name="description" content="Zamów głosem - restauracje, taxi, hotele" />
-  <meta name="color-scheme" content="dark light" />
-  <meta name="theme-color" content="#ff8a30" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="FreeFlow" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  
-  <!-- PWA Manifest -->
-  <link rel="manifest" href="manifest.json" />
-<meta name="asr-proxy" content="https://freeflow-backend-vercel.vercel.app/api/asr" />
-<meta name="gpt-proxy" content="https://freeflow-backend-vercel.vercel.app/api/gpt" />
-  <meta name="gmaps-proxy" content="https://freeflow-backend-vercel.vercel.app/api/places" />
-  <meta name="health-proxy" content="https://freeflow-backend-vercel.vercel.app/api/health" />
-  
-  <!-- Icons -->
-  <link rel="icon" type="image/png" href="images/Freeflow-logo.png" />
-  <link rel="apple-touch-icon" href="images/Freeflowlogo.png" />
-  
-  <!-- Preload critical resources -->
-  <link rel="preload" href="images/Background.png" as="image" />
-  <link rel="preload" href="images/Freeflowlogo.png" as="image" />
-  <script type="module" crossorigin src="assets/index-COXBdQo2.js"></script>
-  <link rel="stylesheet" crossorigin href="assets/index-BKqsNBK6.css">
-  <script src="geo-fallback.js"></script>
-</head>
-
-<body>
-  <div id="root"></div>
-  
-  <!-- PWA Service Worker -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-          .then((registration) => {
-            console.log('SW registered: ', registration);
-          })
-          .catch((registrationError) => {
-            console.log('SW registration failed: ', registrationError);
-          });
-      });
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FreeFlow — Voice to order</title>
+  <meta name="theme-color" content="#0c0f14" />
+  <style>
+    :root{
+      --bg:#0c0f14; --panel:#141823; --card:#111625; --btn:#1f2737; --txt:#e7edf7; --muted:#98a2b3; --accent:#ff7a18;
     }
-  </script>
-<style>
-#minimax-floating-ball {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  padding: 10px 12px;
-  background: #222222;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  color: #F8F8F8;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  z-index: 9999;
-  transition: all 0.3s ease;
-  overflow: hidden;
-  cursor: pointer;
-}
+    *{box-sizing:border-box} html,body{height:100%} body{
+      margin:0;background:radial-gradient(80vw 80vh at 70% -10%,#1b2233 5%,#0c0f14 50%),var(--bg);
+      color:var(--txt);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
+    }
+    a{color:inherit;text-decoration:none}
+    .shell{max-width:1100px;margin:0 auto;padding:18px}
+    .row{display:flex;align-items:center;gap:12px}
+    .brand{font-size:26px;font-weight:800}
+    .brand span{color:var(--accent)}
+    .spacer{flex:1}
+    .pill{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:var(--card);border:1px solid #20283a}
+    .muted{color:var(--muted)}
+    .icon-btn{width:42px;height:42px;border-radius:12px;border:1px solid #20283a;background:var(--card);display:grid;place-items:center;cursor:pointer}
+    .cart-dot{position:absolute;top:-6px;right:-6px;background:#ff8c3a;color:#000;font-weight:700;border-radius:999px;padding:0 6px;font-size:12px}
+    .panel{background:var(--panel);border:1px solid #20283a;border-radius:18px;padding:18px}
+    .h2{font-size:18px;margin:0 0 10px}
+    input,textarea{width:100%;background:#0f1420;border:1px solid #20283a;border-radius:12px;color:var(--txt);padding:12px 14px;outline:none}
+    button{background:var(--btn);border:1px solid #26314a;color:var(--txt);padding:12px 14px;border-radius:12px;cursor:pointer}
+    button.primary{background:#1e824c;border-color:#2aa866}
+    .grid{display:grid;gap:14px}
+    @media(min-width:800px){.grid{grid-template-columns:1fr 1fr}}
+    .chip{display:inline-flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;border:1px dashed #2a3246;background:#0f1420}
+    .bottom{position:fixed;inset:auto 0 16px 0}
+    /* Drawer */
+    .drawer-mask{position:fixed;inset:0;background:#0008;opacity:0;pointer-events:none;transition:.2s}
+    .drawer{position:fixed;top:0;right:-420px;width:420px;max-width:95vw;height:100%;background:var(--panel);border-left:1px solid #20283a;transition:.25s;padding:18px;overflow:auto}
+    .drawer.open~.drawer-mask{opacity:1;pointer-events:auto}
+    .drawer.open{right:0}
+  </style>
+</head>
+<body>
+  <header class="shell row">
+    <div class="brand"><span>Free</span>Flow</div>
+    <div class="spacer"></div>
+    <div class="row" style="gap:10px">
+      <div class="icon-btn" title="Koszyk" style="position:relative">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 6h15l-2 10H8L6 6Z" stroke="#e7edf7"/><path d="M6 6l-2-2" stroke="#e7edf7"/></svg>
+        <div class="cart-dot" id="cartCount">0</div>
+      </div>
+      <div class="icon-btn" id="btnOpenMenu" title="Menu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M8 17h12" stroke="#e7edf7" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+  </header>
 
-#minimax-floating-ball:hover {
-  transform: translateY(-2px);
-  background: #383838;
-}
-.minimax-ball-content {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
+  <main class="shell grid">
+    <!-- KONFIG BACKENDU -->
+    <section class="panel">
+      <h2 class="h2">URL backendu (Vercel)</h2>
+      <div class="row" style="gap:10px">
+        <input id="backendUrl" placeholder="https://twoj-backend.vercel.app" />
+        <button id="btnSave">Zapisz</button>
+        <button id="btnPing">Ping /health</button>
+      </div>
+      <p class="muted" id="statusText">Stan: nieznany</p>
+    </section>
 
-.minimax-logo-wave {
-  width: 26px;
-  height: 22px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='22' viewBox='0 0 26 22' fill='none'%3E%3Cg clip-path='url(%23clip0_3442_102412)'%3E%3Cpath d='M12.8405 14.6775C12.8405 14.9897 13.0932 15.2424 13.4055 15.2424C13.7178 15.2424 13.9705 14.9897 13.9705 14.6775V2.98254C13.9705 1.88957 13.0809 1 11.9879 1C10.895 1 10.0054 1.88957 10.0054 2.98254V11.566V17.1068C10.0054 17.5773 9.62327 17.9594 9.1528 17.9594C8.68233 17.9594 8.30021 17.5773 8.30021 17.1068V8.04469C8.30021 6.95172 7.41063 6.06215 6.31767 6.06215C5.22471 6.06215 4.33513 6.95172 4.33513 8.04469V11.8855C4.33513 12.3559 3.953 12.7381 3.48254 12.7381C3.01207 12.7381 2.62994 12.3559 2.62994 11.8855V10.4936C2.62994 10.1813 2.37725 9.92861 2.06497 9.92861C1.7527 9.92861 1.5 10.1813 1.5 10.4936V11.8855C1.5 12.9784 2.38957 13.868 3.48254 13.868C4.5755 13.868 5.46508 12.9784 5.46508 11.8855V8.04469C5.46508 7.57422 5.8472 7.19209 6.31767 7.19209C6.78814 7.19209 7.17026 7.57422 7.17026 8.04469V17.1068C7.17026 18.1998 8.05984 19.0894 9.1528 19.0894C10.2458 19.0894 11.1353 18.1998 11.1353 17.1068V2.98254C11.1353 2.51207 11.5175 2.12994 11.9879 2.12994C12.4584 2.12994 12.8405 2.51207 12.8405 2.98254V14.6775Z' fill='%23F8F8F8'/%3E%3Cpath d='M23.3278 6.06215C22.2348 6.06215 21.3452 6.95172 21.3452 8.04469V15.6143C21.3452 16.0847 20.9631 16.4669 20.4926 16.4669C20.0222 16.4669 19.6401 16.0847 19.6401 15.6143V2.98254C19.6401 1.88957 18.7505 1 17.6575 1C16.5645 1 15.675 1.88957 15.675 2.98254V19.0175C15.675 19.4879 15.2928 19.8701 14.8224 19.8701C14.3519 19.8701 13.9698 19.4879 13.9698 19.0175V17.0329C13.9698 16.7206 13.7171 16.4679 13.4048 16.4679C13.0925 16.4679 12.8398 16.7206 12.8398 17.0329V19.0175C12.8398 20.1104 13.7294 21 14.8224 21C15.9153 21 16.8049 20.1104 16.8049 19.0175V2.98254C16.8049 2.51207 17.187 2.12994 17.6575 2.12994C18.128 2.12994 18.5101 2.51207 18.5101 2.98254V15.6143C18.5101 16.7072 19.3997 17.5968 20.4926 17.5968C21.5856 17.5968 22.4752 16.7072 22.4752 15.6143V8.04469C22.4752 7.57422 22.8573 7.19209 23.3278 7.19209C23.7982 7.19209 24.1804 7.57422 24.1804 8.04469V14.6775C24.1804 14.9897 24.4331 15.2424 24.7453 15.2424C25.0576 15.2424 25.3103 14.9897 25.3103 14.6775V8.04469C25.3103 6.95172 24.4207 6.06215 23.3278 6.06215Z' fill='%23F8F8F8'/%3E%3C/g%3E%3Cdefs%3E%3CclipPath id='clip0_3442_102412'%3E%3Crect width='25' height='22' fill='white' transform='translate(0.5)'/%3E%3C/clipPath%3E%3C/defs%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: center;
-}
+    <!-- WYSZUKIWANIE -->
+    <section class="panel">
+      <h2 class="h2">Wyszukiwanie po lokalizacji</h2>
+      <div class="row" style="gap:10px">
+        <input id="searchCity" placeholder="Wpisz miasto lub adres…" />
+        <button id="btnSearch">🔎</button>
+      </div>
+    </section>
 
-.minimax-ball-text {
-  font-size: 12px;
-  font-weight: 500;
-  white-space: nowrap;
-}
+    <!-- ASYSTENT -->
+    <section class="panel" style="grid-column:1/-1">
+      <div class="row" style="gap:12px;justify-content:space-between">
+        <h2 class="h2" style="margin:0">Asystent — krótkie odpowiedzi PL</h2>
+        <span class="muted pill" id="modelPill">model: gpt-4o-mini</span>
+      </div>
+      <textarea id="prompt" rows="4" placeholder="Np. Zamówić dwie pizze na Kazimierzu — jaka dzielnica?"></textarea>
+      <div class="row" style="gap:10px;margin-top:10px">
+        <button class="primary" id="btnAsk">Wyślij do /api/gpt</button>
+        <button id="btnClear">Wyczyść</button>
+      </div>
+      <div id="answer" class="chip" style="margin-top:12px;display:none"></div>
+    </section>
+  </main>
 
-.minimax-close-icon {
-  margin-left: 8px;
-  font-size: 16px;
-  width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  cursor: pointer;
-  opacity: 0.7;
-  transition: opacity 0.2s ease;
-}
-
-.minimax-close-icon:hover {
-  opacity: 1;
-}
-</style>
-<div id="minimax-floating-ball">
-  <div class="minimax-ball-content">
-    <div class="minimax-logo-wave"></div>
-    <span class="minimax-ball-text">Created by MiniMax Agent</span>
+  <!-- DOLNY PASEK (mikrofon + kategorie) -->
+  <div class="bottom shell">
+    <div class="row" style="gap:12px;justify-content:space-between;flex-wrap:wrap">
+      <div class="chip" style="flex:1;min-width:260px">
+        <span style="width:10px;height:10px;border-radius:999px;background:#50e3a4;display:inline-block"></span>
+        <span class="muted">Mów tutaj…</span>
+        <div class="spacer"></div>
+        <button>🎤</button>
+      </div>
+      <div class="row" style="gap:10px;flex-wrap:wrap">
+        <button class="pill">🍽️ Jedzenie</button>
+        <button class="pill">🚕 Taxi</button>
+        <button class="pill">🏨 Hotele</button>
+        <button class="pill">…</button>
+      </div>
+    </div>
   </div>
-  <div class="minimax-close-icon">×</div>
-</div>
-<script>
-// Initialize floating ball functionality
-function initFloatingBall() {
-  const ball = document.getElementById('minimax-floating-ball');
-  if (!ball) return;
 
-  // Initial animation
-  ball.style.opacity = '0';
-  ball.style.transform = 'translateY(20px)';
+  <!-- DRAWER -->
+  <aside id="drawer" class="drawer" aria-hidden="true">
+    <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:8px">
+      <div class="brand"><span>Free</span>Flow</div>
+      <div class="icon-btn" id="btnCloseMenu" title="Zamknij">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="#e7edf7" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+    <p class="muted" id="dbg">DEBUG: Menu otwarte, expanded: brak, showAuthModal: false</p>
 
-  setTimeout(() => {
-    ball.style.opacity = '1';
-    ball.style.transform = 'translateY(0)';
-  }, 500);
+    <div class="panel" style="margin-bottom:14px">
+      <div class="row" style="gap:8px"><strong>Klient Prywatny</strong><div class="spacer"></div></div>
+      <div class="grid">
+        <button>Zaloguj się</button>
+        <button>Zarejestruj konto</button>
+        <button>Moje zamówienia</button>
+        <button>Ulubione restauracje</button>
+      </div>
+    </div>
 
-  // Handle logo click
-  const ballContent = ball.querySelector('.minimax-ball-content');
-  ballContent.addEventListener('click', function (e) {
-    e.stopPropagation();
-    window.open('https://agent.minimax.io/agent', '_blank');
-    ball.style.transform = 'scale(0.95)';
-    setTimeout(() => {
-      ball.style.transform = 'scale(1)';
-    }, 100);
-  });
+    <div class="panel" style="margin-bottom:14px">
+      <div class="row" style="gap:8px"><strong>Firma</strong><div class="spacer"></div></div>
+      <div class="grid">
+        <button>Panel firmy</button>
+        <button>Fakturowanie</button>
+      </div>
+    </div>
 
-  // Handle close button click
-  const closeIcon = ball.querySelector('.minimax-close-icon');
-  closeIcon.addEventListener('click', function (e) {
-    e.stopPropagation();
-    ball.style.opacity = '0';
-    ball.style.transform = 'translateY(20px)';
+    <div class="panel">
+      <div class="row" style="gap:8px"><strong>Wsparcie i Ustawienia</strong><div class="spacer"></div></div>
+      <div class="grid">
+        <button>FAQ / pomoc</button>
+        <button>Ustawienia aplikacji</button>
+        <button>Język / waluta</button>
+      </div>
+    </div>
+  </aside>
+  <div id="drawerMask" class="drawer-mask"></div>
 
-    setTimeout(() => {
-      ball.style.display = 'none';
-    }, 300);
-  });
-}
+  <script>
+    // --- STORAGE + UI helpers
+    const $ = s => document.querySelector(s);
+    const backendKey = 'freeflow.backendUrl';
+    const elUrl = $('#backendUrl'), elStatus = $('#statusText'), elAns = $('#answer');
 
-// Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', initFloatingBall); 
-</script>
+    function loadBackend() {
+      const v = localStorage.getItem(backendKey) || '';
+      if (v) elUrl.value = v;
+      paintStatus('Stan: ' + (v ? 'skonfigurowany' : 'nieznany'));
+    }
+    function saveBackend() {
+      const v = (elUrl.value || '').trim().replace(/\/+$/,'');
+      localStorage.setItem(backendKey, v);
+      paintStatus('Zapisano URL backendu');
+    }
+    function getBase(){ return (localStorage.getItem(backendKey) || '').replace(/\/+$/,''); }
+    function paintStatus(t){ elStatus.textContent = t; }
+
+    // --- Drawer
+    const drawer = $('#drawer'), mask = $('#drawerMask');
+    $('#btnOpenMenu').onclick = () => { drawer.classList.add('open'); drawer.setAttribute('aria-hidden','false'); }
+    $('#btnCloseMenu').onclick = mask.onclick = () => { drawer.classList.remove('open'); drawer.setAttribute('aria-hidden','true'); }
+
+    // --- Ping /health
+    async function ping() {
+      const base = getBase();
+      if(!base){ paintStatus('Ustaw najpierw URL backendu'); return; }
+      try{
+        const r = await fetch(base + '/api/health', {headers:{'accept':'application/json'}});
+        const ok = r.ok ? 'OK' : r.status;
+        paintStatus('Ping: ' + ok);
+      }catch(e){ paintStatus('Ping błąd: ' + e.message); }
+    }
+
+    // --- Ask /api/gpt
+    async function ask(){
+      const base = getBase();
+      if(!base){ elAns.style.display='block'; elAns.textContent='Ustaw URL backendu.'; return; }
+      const prompt = ($('#prompt').value || '').trim();
+      if(!prompt){ elAns.style.display='block'; elAns.textContent='Wpisz pytanie.'; return; }
+      elAns.style.display='block'; elAns.textContent='…';
+      try{
+        const r = await fetch(base + '/api/gpt', {
+          method:'POST',
+          headers:{'content-type':'application/json'},
+          body: JSON.stringify({ prompt })
+        });
+        const data = await r.json().catch(()=> ({}));
+        if(!r.ok) throw new Error((data && data.error) || ('HTTP '+r.status));
+        elAns.textContent = data.reply || '(pusta odpowiedź)';
+      }catch(e){ elAns.textContent = 'Błąd: ' + e.message; }
+    }
+
+    // --- Wire
+    $('#btnSave').onclick = saveBackend;
+    $('#btnPing').onclick = ping;
+    $('#btnAsk').onclick = ask;
+    $('#btnClear').onclick = () => { $('#prompt').value=''; elAns.style.display='none'; }
+    $('#btnSearch').onclick = () => alert('TODO: wyszukiwarka');
+
+    // Init
+    loadBackend();
+  </script>
 </body>
-
 </html>
