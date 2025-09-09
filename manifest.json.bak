@@ -2,7 +2,7 @@
   "name": "FreeFlow - Voice to Order",
   "short_name": "FreeFlow",
   "description": "Zamów głosem - restauracje, taxi, hotele",
-  "start_url": ""./",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#0d0f13",
   "theme_color": "#ff8a30",
