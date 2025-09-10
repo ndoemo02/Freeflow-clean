@@ -2,244 +2,330 @@
 <html lang="pl">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>FreeFlow — Voice to order</title>
+  <meta name="color-scheme" content="dark" />
   <style>
     :root{
-      --bg:#0b0f14; --panel:#121a22; --card:#0f1620; --txt:#e6eef7; --muted:#9fb0c3;
-      --brand:#ff812b; --ok:#26d07c; --danger:#ff4d4d; --btn:#1f6c3f; --btn2:#223344; --accent:#1f8fff;
-      --radius:16px;
+      --bg:#0c0f14; --panel:#141823; --card:#111625; --btn:#1f2737;
+      --accent:#ff7a18; --ok:#22c55e; --danger:#ef4444; --muted:#94a3b8;
+      --ring:rgba(255,122,24,.25)
     }
-    *{box-sizing:border-box}
-    html,body{height:100%}
+    *{box-sizing:border-box} html,body{height:100%}
     body{
-      margin:0; background:radial-gradient(1200px 800px at 80% -10%,#101826 0%,#0b0f14 60%),
-                linear-gradient(180deg,#0b0f14 0%,#0b0f14 100%);
-      color:var(--txt); font:400 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial;
+      margin:0;color:#e5e7eb;background:#0b0f14 fixed no-repeat center/cover url("./images/Background.png");
+      font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue","Noto Sans","Liberation Sans",Arial,"Apple Color Emoji","Segoe UI Emoji"
     }
-    .wrap{max-width:980px; margin:0 auto; padding:20px 16px 64px}
-    header{display:flex; align-items:center; gap:16px; margin:8px 0 18px}
-    .brand{font-weight:800; font-size:30px; letter-spacing:.2px}
-    .brand .a{color:var(--brand)}
-    .panel{background:linear-gradient(180deg,#111925 0%,#0f1721 100%); border:1px solid #1c2a3a;
-      border-radius:var(--radius); padding:18px; box-shadow:0 10px 30px rgba(0,0,0,.25); margin:0 0 18px}
-    .row{display:flex; gap:12px; align-items:center; flex-wrap:wrap}
-    label{display:block; color:var(--muted); font-size:14px; margin:0 0 10px}
-    input, textarea{
-      width:100%; color:var(--txt); background:#0c141e; border:1px solid #243447; border-radius:12px;
-      padding:14px 14px; outline:none; transition:.15s border-color,.15s box-shadow;
+    .scrim{backdrop-filter:saturate(110%) blur(2px)}
+    .container{max-width:1100px;margin:0 auto;padding:20px}
+    .topbar{display:flex;align-items:center;gap:14px}
+    .brand{display:flex;align-items:center;gap:10px}
+    .brand img{width:36px;height:36px;border-radius:9px;display:block}
+    .brand h1{margin:0;font-weight:800}
+    .brand .free{color:#ff7a18}.brand .flow{color:#fff}
+
+    .actions{margin-left:auto;display:flex;gap:10px}
+    .iconbtn{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;
+      background:linear-gradient(180deg,#1a2231,#131a26); border:1px solid #2a3446; color:#d1d5db; cursor:pointer}
+    .badge{position:absolute translate: 10px -10px; background:#ff7a18;color:#000;font-weight:700;
+      font-size:12px;border-radius:999px;padding:2px 6px;border:1px solid #0009}
+
+    .panel{margin-top:16px;padding:18px;border-radius:16px;background:radial-gradient(200% 140% at 100% 0%, #0f1520, #0b0f14 60%);border:1px solid #1f2634}
+    .section{background:#0f1420; border:1px solid #1c2332; border-radius:16px; padding:16px; margin:16px 0}
+    .section h3{margin:0 0 10px 0}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    input[type=text], textarea{
+      width:100%; background:#0b101a; color:#e5e7eb; border:1px solid #222a39; border-radius:12px; padding:12px 14px;
+      outline:none; box-shadow:none
     }
-    input:focus, textarea:focus{border-color:#2b71ff; box-shadow:0 0 0 3px rgba(43,113,255,.15)}
-    textarea{min-height:130px; resize:vertical}
+    textarea{min-height:120px; resize:vertical}
     .btn{
-      appearance:none; border:0; border-radius:12px; padding:12px 16px; color:#fff; cursor:pointer;
-      background:var(--btn); font-weight:600; letter-spacing:.2px; transition:filter .12s, transform .02s;
+      background:#1c2433; border:1px solid #2a3446; color:#e5e7eb; padding:12px 16px; border-radius:12px; cursor:pointer;
+      transition:.15s; font-weight:600
     }
-    .btn:active{transform:translateY(1px)}
-    .btn.secondary{background:var(--btn2)}
-    .btn.accent{background:var(--accent)}
-    .btn.warn{background:var(--danger)}
-    .status{font-weight:600; color:var(--muted)}
+    .btn:hover{filter:brightness(1.08)}
+    .btn.primary{background:linear-gradient(180deg,#26324a,#1c2436); border-color:#33405a}
+    .btn.success{background:#12341d;border-color:#165a2f;color:#c7ffd7}
+    .btn.danger{background:#3a1111;border-color:#6a1b1b;color:#ffd1d1}
+    .status{font-size:14px;color:#a8b3c7;margin-top:8px}
     .ok{color:var(--ok)} .bad{color:var(--danger)}
-    .chips{display:flex; gap:10px; flex-wrap:wrap}
-    .chip{background:#0c141e; border:1px solid #243447; padding:8px 12px; border-radius:999px; color:var(--muted)}
-    .muted{color:var(--muted)}
-    .out{white-space:pre-wrap; background:#0c141e; border:1px solid #243447; border-radius:12px; padding:14px}
-    .section-title{display:flex; justify-content:space-between; align-items:center; gap:12px}
-    .mini{font-size:13px; color:var(--muted)}
-    /* chowamy watermarky */
-    .minimax-badge, [class*="Created by MiniMax"], [data-minimax-badge] { display:none !important; visibility:hidden !important; }
+
+    /* hamburger */
+    .drawer-backdrop{position:fixed;inset:0;background:#0008;opacity:0;pointer-events:none;transition:.2s}
+    .drawer{position:fixed;top:0;right:0;height:100%;width:92vw;max-width:420px;background:#0e1421;border-left:1px solid #252e3f;
+      transform:translateX(100%);transition:.25s;display:flex;flex-direction:column}
+    .drawer.open{transform:none}
+    .drawer-backdrop.open{opacity:1;pointer-events:all}
+    .drawer .head{display:flex;align-items:center;gap:10px;padding:16px;border-bottom:1px solid #1e2737}
+    .drawer .head img{width:28px;height:28px;border-radius:8px}
+    .drawer .content{padding:16px;overflow:auto}
+    .group{margin:12px 0}
+    .group h4{margin:0 0 8px 0;color:#cbd5e1}
+    .tile{background:#0b101a;border:1px solid #1f2838;border-radius:12px;padding:12px 14px;margin:8px 0;display:flex;align-items:center;justify-content:space-between}
+    .muted{color:#94a3b8}
+    .pillbar{display:flex;gap:10px;position:sticky;bottom:16px;margin-top:16px}
+    .pill{flex:1;text-align:center;padding:14px;border-radius:16px;background:#0b101a;border:1px solid #262f40}
+
+    /* mic bubble row */
+    .microw{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .chip{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:10px 14px;border:1px solid #273247;background:#0e1624}
+    .dot{width:10px;height:10px;border-radius:99px;background:#475569}
+    .dot.live{background:#ef4444; box-shadow:0 0 0 6px #ef444433}
+    small{color:#94a3b8}
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <div class="brand"><span class="a">Free</span>Flow</div>
-      <div class="chip">Voice to order — Złóż zamówienie</div>
-    </header>
+  <div class="container">
+    <div class="topbar">
+      <div class="brand">
+        <img src="./images/Freeflowlogo.png" alt="FreeFlow Logo" />
+        <h1 class="free">Free<span class="flow">Flow</span></h1>
+      </div>
+      <div class="actions">
+        <button id="cartBtn" class="iconbtn" title="Koszyk" aria-label="Koszyk">🛒</button>
+        <button id="menuBtn" class="iconbtn" title="Menu" aria-label="Menu">☰</button>
+      </div>
+    </div>
 
-    <!-- Backend URL + Ping -->
-    <section class="panel">
-      <div class="section-title">
-        <h3 style="margin:0">URL backendu (Vercel)</h3>
+    <div class="panel scrim">
+      <h2 style="margin:0 0 8px 0">Voice to order — Złóż zamówienie</h2>
+      <p class="muted" style="margin:0 0 14px 0">Restauracja, taxi albo hotel?</p>
+
+      <!-- Ustawienia backendu -->
+      <div class="section">
+        <h3>URL backendu (Vercel)</h3>
+        <div class="row">
+          <input id="backendUrl" type="text" placeholder="https://twój-backend.vercel.app" />
+          <button id="saveBackend" class="btn primary">Zapisz</button>
+          <button id="pingBtn" class="btn">Ping /health</button>
+        </div>
         <div id="healthStatus" class="status">Stan: <span class="muted">nieznany</span></div>
       </div>
-      <label for="backendUrl">Adres (np. https://twoj-backend.vercel.app)</label>
+
+      <!-- Szukanie -->
+      <div class="section">
+        <h3>Wyszukiwanie po lokalizacji</h3>
+        <div class="row">
+          <input id="geoInput" type="text" placeholder="Wpisz miasto lub adres…" />
+          <button class="btn">🔎</button>
+        </div>
+      </div>
+
+      <!-- Asystent -->
+      <div class="section">
+        <div class="row" style="align-items:center;justify-content:space-between">
+          <h3 style="margin:0">Asystent — krótkie odpowiedzi PL</h3>
+          <small>model: gpt-4o-mini</small>
+        </div>
+        <p class="muted">Przykład: „Zamówić dwie pizze na Kazimierzu — jaka dzielnica?”</p>
+
+        <textarea id="prompt" placeholder="Napisz wiadomość…"></textarea>
+
+        <div class="row" style="margin-top:10px">
+          <button id="sendBtn" class="btn success">Wyślij do /api/gpt</button>
+          <button id="clearBtn" class="btn">Wyczyść</button>
+          <button id="ttsBtn" class="btn">🔊 Odtwórz odpowiedź</button>
+        </div>
+
+        <div class="microw" style="margin-top:12px">
+          <span class="chip"><span id="liveDot" class="dot"></span> <span id="recLabel">Mikrofon: gotowy</span></span>
+          <button id="recBtn" class="btn">🎙️ Nagraj</button>
+          <button id="stopBtn" class="btn danger" disabled>■ Stop</button>
+        </div>
+
+        <div style="margin-top:12px">
+          <label class="muted">Odpowiedź</label>
+          <textarea id="reply" readonly></textarea>
+        </div>
+      </div>
+
+      <!-- Kafelki na dole -->
       <div class="row">
-        <input id="backendUrl" placeholder="https://..." inputmode="url" />
-        <button id="saveUrl" class="btn">Zapisz</button>
-        <button id="pingBtn" class="btn secondary">Ping /health</button>
+        <div class="pill">🍽️ Jedzenie</div>
+        <div class="pill">🚕 Taxi</div>
+        <div class="pill">🏨 Hotele</div>
       </div>
-    </section>
-
-    <!-- Location search (placeholder pod przyszłe feature’y) -->
-    <section class="panel">
-      <h3 style="margin:0 0 10px">Wyszukiwanie po lokalizacji</h3>
-      <div class="row">
-        <input id="geo" placeholder="Wpisz miasto lub adres…" />
-        <button class="btn secondary" id="geoBtn">🔎</button>
-      </div>
-    </section>
-
-    <!-- Assistant -->
-    <section class="panel">
-      <div class="section-title">
-        <h3 style="margin:0">Asystent — krótkie odpowiedzi PL</h3>
-        <div class="mini">model: gpt-4o-mini</div>
-      </div>
-      <p class="muted" style="margin-top:6px">
-        Przykład: „Zamówić dwie pizze na Kazimierzu — jaka dzielnica?”
-      </p>
-
-      <label for="prompt">Wiadomość</label>
-      <textarea id="prompt" placeholder="Napisz lub użyj mikrofonu…"></textarea>
-
-      <div class="row" style="margin-top:10px">
-        <button id="sendBtn" class="btn accent">Wyślij do /api/gpt</button>
-        <button id="clearBtn" class="btn secondary">Wyczyść</button>
-        <button id="micBtn" class="btn">🎙️ Mów</button>
-        <button id="stopTtsBtn" class="btn secondary">⏹️ TTS</button>
-      </div>
-
-      <h4 style="margin:18px 0 8px">Odpowiedź</h4>
-      <div id="reply" class="out">–</div>
-    </section>
-
-    <div class="chips" style="margin-top:10px">
-      <div class="chip">🍽️ Jedzenie</div>
-      <div class="chip">🚖 Taxi</div>
-      <div class="chip">🏨 Hotele</div>
     </div>
   </div>
 
+  <!-- Drawer -->
+  <div id="drawerBackdrop" class="drawer-backdrop"></div>
+  <aside id="drawer" class="drawer">
+    <div class="head">
+      <img src="./images/Freeflowlogo.png" alt="Logo">
+      <div>
+        <div style="font-weight:700">FreeFlow</div>
+        <div class="muted" style="font-size:12px">Niezalogowany</div>
+      </div>
+      <button id="closeDrawer" class="iconbtn" style="margin-left:auto" aria-label="Zamknij">✕</button>
+    </div>
+    <div class="content">
+      <div class="group">
+        <h4>Klient Prywatny</h4>
+        <div class="tile">Zaloguj się <span class="muted">→</span></div>
+        <div class="tile">Zarejestruj konto <span class="muted">→</span></div>
+        <div class="tile">Moje zamówienia <span class="muted">→</span></div>
+        <div class="tile">Ulubione restauracje <span class="muted">→</span></div>
+      </div>
+      <div class="group">
+        <h4>Firma</h4>
+        <div class="tile">Panel firmy <span class="muted">→</span></div>
+      </div>
+      <div class="group">
+        <h4>Wsparcie i Ustawienia</h4>
+        <div class="tile">FAQ / pomoc <span class="muted">→</span></div>
+        <div class="tile">Ustawienia aplikacji <span class="muted">→</span></div>
+        <div class="tile">Język / waluta <span class="muted">→</span></div>
+      </div>
+    </div>
+  </aside>
+
   <script>
-    // ===== Helpers: storage + UI =====
-    const $ = s => document.querySelector(s);
-    const backendInput = $('#backendUrl');
-    const healthStatus = $('#healthStatus');
-    const replyEl = $('#reply');
-    const promptEl = $('#prompt');
-
-    const STORAGE_KEY = 'ff_backend_url';
-
-    const getBase = () => (backendInput.value || '').trim().replace(/\/+$/,'');
-    const setStatus = (ok, text) => {
-      healthStatus.innerHTML = 'Stan: ' + (ok ? `<span class="ok">OK</span>` : `<span class="bad">${text||'BŁĄD'}</span>`);
+    // ---------- storage helpers ----------
+    const store = {
+      get(k, def=""){ try{ const v=localStorage.getItem(k); return v ?? def }catch{ return def } },
+      set(k, v){ try{ localStorage.setItem(k, v) }catch{} }
     };
 
-    // init
-    (function init() {
-      const saved = localStorage.getItem(STORAGE_KEY) || '';
-      if (saved) backendInput.value = saved;
-      // automatyczny ping przy starcie (jeśli mamy URL)
-      if (saved) ping();
-    })();
+    // ---------- elements ----------
+    const backendInput = document.getElementById('backendUrl');
+    const saveBackend  = document.getElementById('saveBackend');
+    const pingBtn      = document.getElementById('pingBtn');
+    const healthStatus = document.getElementById('healthStatus');
 
-    // ===== Ping /health =====
-    async function ping() {
-      const base = getBase();
-      if (!base) { setStatus(false, 'brak URL'); return; }
-      setStatus(false, 'sprawdzam…');
-      try {
-        const r = await fetch(`${base}/api/health`, { method:'GET' });
-        const ok = r.ok;
-        let txt = '';
-        try { txt = await r.text(); } catch(_){}
-        setStatus(ok, ok ? 'OK' : (txt || `HTTP ${r.status}`));
-      } catch (e) {
-        setStatus(false, e.message || 'błąd sieci');
-      }
+    const promptEl = document.getElementById('prompt');
+    const replyEl  = document.getElementById('reply');
+    const sendBtn  = document.getElementById('sendBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const ttsBtn   = document.getElementById('ttsBtn');
+
+    const recBtn   = document.getElementById('recBtn');
+    const stopBtn  = document.getElementById('stopBtn');
+    const recLabel = document.getElementById('recLabel');
+    const liveDot  = document.getElementById('liveDot');
+
+    const drawer        = document.getElementById('drawer');
+    const drawerBackdrop= document.getElementById('drawerBackdrop');
+    const menuBtn       = document.getElementById('menuBtn');
+    const closeDrawer   = document.getElementById('closeDrawer');
+
+    // ---------- init ----------
+    const DEFAULT_BACKEND = "https://freeflow-backend-vercel.vercel.app";
+    backendInput.value = store.get('backendUrl', DEFAULT_BACKEND);
+
+    function setStatus(ok, text){
+      healthStatus.innerHTML = `Stan: <span class="${ok?'ok':'bad'}">${text}</span>`;
     }
 
-    // ===== Save URL =====
-    $('#saveUrl').onclick = () => {
-      const val = getBase();
-      if (!val) {
-        alert('Podaj poprawny URL backendu (https://… ).');
-        return;
+    // ---------- backend controls ----------
+    saveBackend.addEventListener('click', ()=>{
+      store.set('backendUrl', backendInput.value.trim());
+      setStatus(true,"zapisano URL");
+    });
+
+    pingBtn.addEventListener('click', async ()=>{
+      const url = backendInput.value.trim().replace(/\/$/,'') + "/api/health";
+      setStatus(true, "sprawdzanie…");
+      try{
+        const res = await fetch(url, {headers:{'accept':'application/json'}});
+        if(!res.ok) throw new Error(res.status);
+        const j = await res.json().catch(()=> ({}));
+        setStatus(true, "OK ✅");
+      }catch(e){
+        setStatus(false, "błąd");
       }
-      localStorage.setItem(STORAGE_KEY, val);
-      ping();
-    };
-    $('#pingBtn').onclick = ping;
+    });
 
-    // ===== Send prompt -> /api/gpt =====
-    let ttsEnabled = true;
-    $('#sendBtn').onclick = async () => {
-      const base = getBase();
-      if (!base) return alert('Najpierw zapisz URL backendu.');
+    // ---------- /api/gpt ----------
+    sendBtn.addEventListener('click', async ()=>{
+      const base = backendInput.value.trim().replace(/\/$/,'');
+      const url  = base + "/api/gpt";
       const prompt = promptEl.value.trim();
-      if (!prompt) return alert('Wpisz wiadomość.');
+      if(!prompt){ promptEl.focus(); return; }
 
-      replyEl.textContent = '…';
-      try {
-        const r = await fetch(`${base}/api/gpt`, {
-          method:'POST',
-          headers:{ 'Content-Type':'application/json' },
+      sendBtn.disabled = true; sendBtn.textContent = "Wysyłanie…";
+      try{
+        const res = await fetch(url, {
+          method:"POST",
+          headers:{ "content-type":"application/json", "accept":"application/json" },
           body: JSON.stringify({ prompt })
         });
-        let out = '';
-        if (r.ok) {
-          const data = await r.json().catch(()=>null);
-          out = data?.reply || JSON.stringify(data);
-        } else {
-          out = `Błąd API (${r.status})`;
-          const t = await r.text().catch(()=> '');
-          if (t) out += `\n${t}`;
-        }
-        replyEl.textContent = out || '—';
-        if (out && ttsEnabled) speak(out);
-      } catch (e) {
-        replyEl.textContent = `Błąd: ${e.message || e}`;
+        const data = await res.json().catch(()=> ({}));
+        replyEl.value = data.reply ?? JSON.stringify(data,null,2);
+      }catch(err){
+        replyEl.value = "Błąd połączenia z backendem.";
+      }finally{
+        sendBtn.disabled = false; sendBtn.textContent = "Wyślij do /api/gpt";
       }
-    };
-    $('#clearBtn').onclick = () => { promptEl.value=''; replyEl.textContent='–'; };
+    });
 
-    // ===== Simple Search placeholder =====
-    $('#geoBtn').onclick = () => {
-      const q = ($('#geo').value || '').trim();
-      if (!q) return;
-      alert('Wyszukiwanie (placeholder): ' + q);
-    };
+    clearBtn.addEventListener('click', ()=>{ promptEl.value=""; replyEl.value=""; });
 
-    // ===== ASR (webkitSpeechRecognition) =====
-    const micBtn = $('#micBtn');
-    let recognition = null;
-    if ('webkitSpeechRecognition' in window) {
-      recognition = new webkitSpeechRecognition();
-      recognition.lang = 'pl-PL';
-      recognition.continuous = false;
-      recognition.interimResults = false;
-
-      recognition.onstart = () => { micBtn.textContent = '🎙️ Mówię…'; };
-      recognition.onend   = () => { micBtn.textContent = '🎙️ Mów'; };
-      recognition.onerror = () => { micBtn.textContent = '🎙️ Mów'; };
-
-      recognition.onresult = (ev) => {
-        const text = ev.results[0][0].transcript;
-        promptEl.value = text;
-      };
-
-      micBtn.onclick = () => recognition.start();
-    } else {
-      micBtn.disabled = true;
-      micBtn.title = 'ASR niedostępny w tej przeglądarce';
-    }
-
-    // ===== TTS =====
-    function speak(text) {
-      try {
-        const u = new SpeechSynthesisUtterance(text);
-        u.lang = 'pl-PL';
-        window.speechSynthesis.cancel(); // odetnij poprzednie
-        window.speechSynthesis.speak(u);
-      } catch(_){}
-    }
-    $('#stopTtsBtn').onclick = () => {
-      ttsEnabled = false;
+    // ---------- TTS (Web Speech API) ----------
+    function speak(text){
+      if(!("speechSynthesis" in window)){ alert("TTS nieobsługiwany w tej przeglądarce."); return; }
       window.speechSynthesis.cancel();
-      setTimeout(()=>ttsEnabled=true, 300); // chwilowe wyciszenie
-    };
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = "pl-PL";
+      u.rate = 1.0; u.pitch = 1.0;
+      speechSynthesis.speak(u);
+    }
+    ttsBtn.addEventListener('click', ()=> speak(replyEl.value || "Brak odpowiedzi."));
+
+    // ---------- Recording (MediaRecorder) ----------
+    let media, rec, chunks=[];
+    async function startRec(){
+      try{
+        media = await navigator.mediaDevices.getUserMedia({ audio:true });
+        rec = new MediaRecorder(media, {mimeType: 'audio/webm'});
+        chunks = [];
+        rec.ondataavailable = e=> { if(e.data.size) chunks.push(e.data); };
+        rec.onstop = onRecStop;
+        rec.start();
+        liveDot.classList.add('live');
+        recLabel.textContent = "Nagrywanie…";
+        recBtn.disabled = true; stopBtn.disabled = false;
+      }catch(e){
+        recLabel.textContent = "Brak dostępu do mikrofonu";
+      }
+    }
+    async function onRecStop(){
+      liveDot.classList.remove('live');
+      recBtn.disabled = false; stopBtn.disabled = true;
+      recLabel.textContent = "Wysyłanie audio…";
+      const blob = new Blob(chunks, {type:'audio/webm'});
+      chunks = [];
+      try{
+        const base = backendInput.value.trim().replace(/\/$/,'');
+        const url  = base + "/api/gpt"; // backend może wykrywać audio po Content-Type
+        const form = new FormData();
+        form.append("audio", blob, "voice.webm");
+        const res = await fetch(url, { method:"POST", body: form });
+        const data = await res.json().catch(()=> ({}));
+        replyEl.value = data.reply ?? "[OK] Audio wysłane, odpowiedź brak.";
+        recLabel.textContent = "Gotowy";
+      }catch(e){
+        recLabel.textContent = "Błąd wysyłki audio";
+      }finally{
+        media?.getTracks().forEach(t=>t.stop());
+      }
+    }
+    recBtn.addEventListener('click', startRec);
+    stopBtn.addEventListener('click', ()=> rec?.state==="recording" && rec.stop());
+
+    // ---------- Drawer ----------
+    function openDrawer(open){
+      drawer.classList.toggle('open', open);
+      drawerBackdrop.classList.toggle('open', open);
+    }
+    menuBtn.addEventListener('click', ()=> openDrawer(true));
+    closeDrawer.addEventListener('click', ()=> openDrawer(false));
+    drawerBackdrop.addEventListener('click', ()=> openDrawer(false));
+
+    // Prefill demo tekst
+    if(!promptEl.value){
+      promptEl.value = "Zamówić dwie pizze na Kazimierzu — jaka to dzielnica?";
+    }
   </script>
 </body>
 </html>
