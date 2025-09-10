@@ -1,3 +1,7 @@
-<!doctype html><meta charset="utf-8"><script>
-location.replace(location.origin + location.pathname.replace(/404\.html$/,''));
+<!doctype html><meta charset="utf-8">
+<title>Redirect…</title>
+<script>
+  // proste SPA-fallback: gdy 404 na GH Pages, wróć do index na tym samym katalogu
+  const p = location.pathname.replace(/404\.html$/,'');
+  location.replace(p);
 </script>
