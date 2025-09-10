@@ -4,375 +4,358 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>FreeFlow — Voice to order</title>
-  <meta name="color-scheme" content="dark light" />
+  <meta name="theme-color" content="#111625" />
+
+  <!-- Styl: lekki, ciemny, pomarańczowe akcenty -->
   <style>
     :root{
-      --bg:#0c0f14; --panel:#141823; --card:#111625; --btn:#1f2737; --brand:#ff7a00; --ok:#1db954; --muted:#94a3b8;
+      --bg:#0c0f14; --panel:#141823; --card:#111625; --muted:#95a3b9;
+      --txt:#e8edf7; --sub:#c2cbe0; --accent:#ff7a1a; --accent-2:#ff9340;
+      --ok:#2ecc71; --err:#ff4d4f; --shadow:0 10px 30px rgba(0,0,0,.35);
+      --radius:18px;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
-      margin:0;
-      background: radial-gradient(1200px 700px at 70% 15%, #0f121a 0%, #0c0f14 50%, #0b0e13 100%);
-      color:#e5ecff; font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
+      margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--txt); background:var(--bg);
+      background-image: radial-gradient(1200px 800px at 10% -10%, rgba(255,122,26,.15), transparent 60%),
+                       radial-gradient(1000px 600px at 110% -20%, rgba(255,147,64,.12), transparent 60%);
     }
-    a{color:inherit;text-decoration:none}
-    .shell{min-height:100dvh; display:flex; flex-direction:column; position:relative}
-    /* Top bar */
-    .top{
-      position:sticky; top:0; z-index:50; backdrop-filter:saturate(120%) blur(6px);
-      background:linear-gradient(to bottom, rgba(12,15,20,.9), rgba(12,15,20,.4) 60%, transparent);
-      padding:14px 18px 8px;
-      display:flex; align-items:center; justify-content:space-between;
-    }
-    .brand{
-      display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.3px;
-      font-size:26px;
-    }
-    .brand .free{color:var(--brand)}
-    .actions{display:flex; gap:10px}
-    .iconbtn{
-      display:grid; place-items:center; width:44px; height:44px; border-radius:14px;
-      background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.06);
-    }
-    .pill{position:absolute; top:-6px; right:-6px; background:var(--brand); color:#000; width:20px;height:20px; border-radius:50%; font-size:12px; display:grid; place-items:center; font-weight:700}
-
-    /* Hero */
+    /* tło foto */
     .hero{
-      position:relative; margin:8px 16px 0; border-radius:24px; overflow:hidden; min-height:420px;
-      background:#0b0f15 url("./images/Background.png") center/cover no-repeat;
-      border:1px solid rgba(255,255,255,.06);
+      position:relative; border-radius:calc(var(--radius) + 6px);
+      overflow:hidden; box-shadow:var(--shadow); margin:24px 0 18px;
     }
-    .hero::after{
+    .hero::before{
       content:""; position:absolute; inset:0;
-      background:linear-gradient(180deg, rgba(11,14,19,.35) 0%, rgba(11,14,19,.75) 55%, rgba(11,14,19,.92) 100%);
+      background:url("./images/Background.png") center/cover no-repeat;
+      filter:brightness(.45) blur(.2px);
+      transform:scale(1.02);
     }
-    .hero-inner{position:absolute; inset:0; display:flex; flex-direction:column; padding:22px}
-    .hero h1{margin:0 0 6px; font-size:40px; letter-spacing:.3px}
-    .hero p{margin:0; color:var(--muted)}
-    .logo{
-      margin:auto; width:min(560px, 88%); max-height:360px; object-fit:contain; filter:drop-shadow(0 12px 40px rgba(0,0,0,.6));
-    }
+    .hero-inner{position:relative; padding:34px 22px 28px}
+    h1{margin:0 0 8px; font-size:42px; line-height:1.1; letter-spacing:.3px}
+    .subtitle{color:var(--sub); font-size:18px}
 
-    /* Floating mic bar */
-    .micbar{
-      position:absolute; left:50%; bottom:20px; transform:translateX(-50%);
-      width:min(980px, 92%); background:rgba(17,22,37,.86); border:1px solid rgba(255,255,255,.06);
-      border-radius:18px; padding:10px; display:flex; gap:10px; align-items:center; backdrop-filter:blur(6px);
+    /* top bar */
+    .top{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:16px 14px 0; gap:12px;
     }
-    .micdot{width:10px; height:10px; border-radius:50%; background:#3b82f6; box-shadow:0 0 0 6px rgba(59,130,246,.15)}
-    .micinput{flex:1; border:none; outline:none; background:transparent; color:#e8f0ff; font-size:16px}
-    .cta{display:flex; gap:12px}
+    .brand{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.2px; font-size:26px}
+    .brand .free{color:var(--accent)}
+    .actions{display:flex; gap:10px}
+    .icon-btn{
+      width:44px; height:44px; border-radius:16px; background:rgba(255,255,255,.06);
+      display:grid; place-items:center; border:1px solid rgba(255,255,255,.08); backdrop-filter: blur(4px);
+    }
+    .pill{
+      display:inline-flex; align-items:center; gap:10px; background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.08); padding:14px; border-radius:var(--radius);
+    }
+    .pill input{
+      width:100%; padding:12px 14px; border-radius:12px; border:1px solid rgba(255,255,255,.08);
+      background:#0f1420; color:var(--txt); outline:none;
+    }
     .btn{
-      background:var(--btn); border:1px solid rgba(255,255,255,.08); color:#e8f0ff;
-      padding:12px 16px; border-radius:14px; font-weight:600; cursor:pointer;
+      appearance:none; border:none; cursor:pointer; font-weight:600; color:#0b111b;
+      background:linear-gradient(135deg,var(--accent),var(--accent-2)); padding:12px 18px;
+      border-radius:14px; transition:.15s transform ease; box-shadow:0 6px 16px rgba(255,122,26,.26);
     }
-    .btn.primary{background:#107a46; border-color:#0c5d35}
-    .btn.warn{background:#7a1010; border-color:#5d0c0c}
-    .btn:disabled{opacity:.6; cursor:not-allowed}
+    .btn:active{transform:translateY(1px)}
+    .btn.secondary{background:#1d2433; color:var(--txt); border:1px solid rgba(255,255,255,.08); box-shadow:none}
 
-    /* Sections */
-    .section{margin:18px 16px 0; padding:18px; background:rgba(17,22,37,.7); border:1px solid rgba(255,255,255,.06); border-radius:22px}
-    .sec-title{display:flex; justify-content:space-between; align-items:end; margin-bottom:10px}
-    .sec-title h2{margin:0; font-size:22px}
-    .muted{color:var(--muted)}
-    .field{display:flex; gap:10px; align-items:center}
-    .input{
-      flex:1; min-height:48px; padding:0 14px; border-radius:12px; border:1px solid rgba(255,255,255,.08);
-      background:#0e1320; color:#e8f0ff; outline:none;
+    /* menu (hamburger) */
+    .drawer{position:fixed; inset:0; display:none}
+    .drawer.open{display:block}
+    .backdrop{position:absolute; inset:0; background:rgba(0,0,0,.45)}
+    .sheet{
+      position:absolute; right:0; top:0; bottom:0; width:min(92vw,420px);
+      background:var(--panel); border-left:1px solid rgba(255,255,255,.08);
+      padding:18px; overflow:auto;
+    }
+    .sheet h3{margin:4px 2px 14px; font-size:18px; color:var(--sub)}
+    .menu-section{background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08);
+      border-radius:16px; padding:14px; margin:12px 0}
+    .menu-item{padding:12px 10px; border-radius:12px; background:#0f1420; margin:8px 0; border:1px solid rgba(255,255,255,.06)}
+    .menu-title{font-weight:700; color:var(--txt)}
+
+    /* karty */
+    .card{
+      background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08);
+      border-radius:var(--radius); padding:16px; margin:10px 0; box-shadow:var(--shadow);
+    }
+    .label{color:var(--sub); font-size:14px; margin-bottom:10px}
+
+    /* asystent */
+    textarea{
+      width:100%; min-height:120px; resize:vertical; padding:12px 14px; line-height:1.4;
+      color:var(--txt); background:#0f1420; border:1px solid rgba(255,255,255,.08); border-radius:12px;
+    }
+    .row{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+    .status{font-size:14px; color:var(--sub); display:flex; gap:8px; align-items:center}
+    .ok{color:var(--ok)} .bad{color:var(--err)}
+
+    /* logo w hero */
+    .logo-wrap{display:grid; place-items:center; padding:20px 0 8px}
+    .logo{
+      width:min(420px,70vw);
+      filter: drop-shadow(0 14px 36px rgba(255,122,26,.35));
     }
 
-    /* Bottom quick categories */
-    .quick{display:flex; gap:16px; justify-content:center; padding:22px 16px 32px}
-    .chip{
-      min-width:140px; padding:14px 18px; display:flex; gap:12px; align-items:center; justify-content:center;
-      background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.06); border-radius:18px;
-      font-weight:700;
+    /* dół: szybkie kafelki */
+    .tiles{display:flex; gap:12px; padding:14px 2px 44px}
+    .tile{
+      flex:1; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08);
+      border-radius:20px; padding:16px; text-align:center; font-weight:700;
     }
 
-    /* Drawer (hamburger) */
-    dialog.drawer{
-      inset:auto 0 0 auto; margin:0; width:min(660px, 92%); max-height:85dvh; border:none; padding:0;
-      background:rgba(17,22,37,.98); color:#eaf2ff; border-radius:20px 20px 0 0;
-      border:1px solid rgba(255,255,255,.08);
-    }
-    .drawer::backdrop{background:rgba(0,0,0,.35) }
-    .drawer .head{display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid rgba(255,255,255,.06)}
-    .drawer .box{padding:14px 16px}
-    .card{background:#0f1526; border:1px solid rgba(255,255,255,.06); border-radius:16px; padding:14px}
-    .row{display:flex; align-items:center; gap:10px}
-    .row + .row{margin-top:10px}
-    .arrow{margin-left:auto; opacity:.7}
-
-    @media (min-width:900px){
-      .hero{min-height:520px}
-      .hero h1{font-size:52px}
-      .micbar{bottom:26px}
+    @media (min-width:960px){
+      .container{max-width:1000px; margin:0 auto; padding:0 14px}
+      h1{font-size:56px}
     }
   </style>
 </head>
 <body>
-<div class="shell">
-
-  <!-- Top bar -->
-  <div class="top">
-    <div class="brand"><span class="free">Free</span>Flow</div>
-    <div class="actions">
-      <a class="iconbtn" href="#" title="Koszyk">
-        <span class="pill">0</span>
-        🛒
-      </a>
-      <button class="iconbtn" id="btnMenu" title="Menu">☰</button>
-    </div>
-  </div>
-
-  <!-- Hero -->
-  <section class="hero">
-    <div class="hero-inner">
-      <div>
-        <h1>Voice to order — Złóż zamówienie</h1>
-        <p>Restauracja, taxi albo hotel?</p>
+  <div class="container">
+    <!-- Top bar -->
+    <div class="top">
+      <div class="brand"><span class="free">Free</span>Flow</div>
+      <div class="actions">
+        <div class="icon-btn" title="Koszyk" aria-label="Koszyk">
+          🛒
+        </div>
+        <button id="hamburger" class="icon-btn" title="Menu" aria-label="Menu">≡</button>
       </div>
-      <img class="logo" src="./images/Freeflowlogo.png" alt="FreeFlow Logo" />
-      <div class="micbar">
-        <div class="micdot" id="recDot" title="status"></div>
-        <input id="micText" class="micinput" placeholder="Kliknij logo aby złożyć zamówienie" />
-        <div class="cta">
-          <button class="btn" id="btnRec">🎙️ Nagraj</button>
-          <button class="btn warn" id="btnStop" disabled>■ Stop</button>
-          <button class="btn primary" id="btnSend">Wyślij</button>
+    </div>
+
+    <!-- HERO: tło + logo + mic -->
+    <section class="hero">
+      <div class="hero-inner">
+        <h1>Voice to order —<br/>Złóż zamówienie</h1>
+        <div class="subtitle">Restauracja, taxi albo hotel?</div>
+        <div class="logo-wrap">
+          <img class="logo" src="./images/Freeflowlogo.png" alt="FreeFlow Logo"/>
+        </div>
+        <div class="row" style="justify-content:center; gap:12px; padding:6px 0 4px;">
+          <button id="recBtn" class="btn secondary">🎙️ Nagraj</button>
+          <button id="stopBtn" class="btn secondary" disabled>⏹️ Stop</button>
+          <button id="ttsBtn" class="btn">🔊 Odtwórz odpowiedź</button>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Backend config -->
-  <section class="section">
-    <div class="sec-title">
-      <h2>URL backendu (Vercel)</h2>
-      <span id="healthStatus" class="muted">Stan: nieznany</span>
-    </div>
-    <div class="field" style="margin-top:8px">
-      <input id="backendUrl" class="input" placeholder="https://twoj-backend.vercel.app" />
-      <button class="btn" id="btnSave">Zapisz</button>
-      <button class="btn" id="btnPing">Ping /health</button>
-    </div>
-  </section>
-
-  <!-- GPT short answers -->
-  <section class="section" id="assist">
-    <div class="sec-title">
-      <h2>Asystent — krótkie odpowiedzi PL</h2>
-      <span class="muted">model: gpt-4o-mini</span>
-    </div>
-
-    <div class="muted" style="margin-bottom:12px">
-      Przykład: „Zamówić dwie pizze na Kazimierzu — jaka dzielnica?”
-    </div>
-
-    <textarea id="prompt" class="input" style="min-height:120px; padding:12px"
-      placeholder="Napisz wiadomość lub użyj Nagraj"></textarea>
-
-    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px">
-      <button class="btn primary" id="btnCall">Wyślij do /api/gpt</button>
-      <button class="btn" id="btnClear">Wyczyść</button>
-      <button class="btn" id="btnSpeak">🔊 Odtwórz odpowiedź</button>
-    </div>
-
-    <div style="margin-top:12px">
-      <label class="muted" style="display:block; margin-bottom:6px">Odpowiedź</label>
-      <textarea id="reply" class="input" style="min-height:90px; padding:12px" readonly></textarea>
-    </div>
-  </section>
-
-  <!-- Quick categories -->
-  <div class="quick">
-    <div class="chip">🍽️ Jedzenie</div>
-    <div class="chip">🚕 Taxi</div>
-    <div class="chip">🏨 Hotele</div>
-  </div>
-
-  <!-- Drawer -->
-  <dialog class="drawer" id="drawer">
-    <div class="head">
-      <div class="row" style="gap:12px">
-        <div class="iconbtn" style="width:42px;height:42px">👤</div>
-        <div>
-          <div style="font-weight:700">Administrator FreeFlow</div>
-          <div class="muted" style="font-size:14px">admin@freeflow.com</div>
+    <!-- Konfiguracja backendu -->
+    <section class="card">
+      <div class="label">URL backendu (Vercel)</div>
+      <div class="row">
+        <div class="pill" style="flex:1 1 360px;">
+          <input id="backendUrl" placeholder="https://twoj-backend.vercel.app"/>
         </div>
+        <button id="saveUrl" class="btn">Zapisz</button>
+        <button id="pingBtn" class="btn secondary">Ping /health</button>
       </div>
-      <button class="iconbtn" id="btnCloseDrawer">✕</button>
-    </div>
-    <div class="box">
-      <div class="card">
-        <div class="row"><span>⚙️ Panel użytkownika</span><span class="arrow">›</span></div>
-        <div class="row"><span>🗣️ Głosowe zamawianie</span><span class="arrow">›</span></div>
-        <div class="row"><span>🧾 Twoje zamówienia</span><span class="arrow">›</span></div>
-        <div class="row"><span>❓ FAQ</span><span class="arrow">›</span></div>
+      <div class="status" style="margin-top:10px;">Stan: <span id="healthState">nieznany</span></div>
+    </section>
+
+    <!-- Asystent -->
+    <section class="card">
+      <div class="label">Asystent — krótkie odpowiedzi PL <span style="opacity:.6">(model: gpt-4o-mini)</span></div>
+      <div style="color:var(--muted); font-size:14px; margin-bottom:10px;">
+        Przykład: „Zamówić dwie pizze na Kazimierzu — jaka dzielnica?”
       </div>
+      <textarea id="prompt" placeholder="Napisz, co chcesz załatwić…"></textarea>
       <div class="row" style="margin-top:12px">
-        <button class="btn warn">Wyloguj się</button>
+        <button id="sendBtn" class="btn">Wyślij do /api/gpt</button>
+        <button id="clearBtn" class="btn secondary">Wyczyść</button>
       </div>
+      <div class="label" style="margin-top:14px;">Odpowiedź</div>
+      <textarea id="answer" placeholder="Tu pojawi się odpowiedź…" readonly></textarea>
+    </section>
+
+    <!-- skróty -->
+    <div class="tiles">
+      <div class="tile">🍽️ Jedzenie</div>
+      <div class="tile">🚕 Taxi</div>
+      <div class="tile">🏨 Hotele</div>
     </div>
-  </dialog>
+  </div>
 
-</div>
+  <!-- Drawer (hamburger) -->
+  <div id="drawer" class="drawer" aria-hidden="true">
+    <div class="backdrop" role="button" aria-label="Zamknij menu"></div>
+    <aside class="sheet" role="dialog" aria-label="Menu">
+      <div class="row" style="justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <div class="brand"><span class="free">Free</span>Flow</div>
+        <button id="closeDrawer" class="icon-btn" aria-label="Zamknij">✕</button>
+      </div>
 
-<script>
-(() => {
-  const $ = (s) => document.querySelector(s);
-  const backendInput = $('#backendUrl');
-  const healthStatus = $('#healthStatus');
-  const promptEl = $('#prompt');
-  const replyEl = $('#reply');
-  const micText = $('#micText');
-  const recDot = $('#recDot');
-  const btnRec = $('#btnRec');
-  const btnStop = $('#btnStop');
-  const btnSendTop = $('#btnSend');
-  const drawer = $('#drawer');
+      <div class="menu-section">
+        <div class="menu-title">Klient Prywatny</div>
+        <div class="menu-item">Zaloguj się</div>
+        <div class="menu-item">Zarejestruj konto</div>
+        <div class="menu-item">Moje zamówienia</div>
+        <div class="menu-item">Ulubione restauracje</div>
+      </div>
 
-  /* -------- Storage for backend -------- */
-  const LS_KEY = 'freeflow.backend';
-  function getBase(){
-    return (localStorage.getItem(LS_KEY) || '').trim();
-  }
-  function setBase(u){
-    localStorage.setItem(LS_KEY, u.trim());
-  }
-  backendInput.value = getBase();
+      <div class="menu-section">
+        <div class="menu-title">Firma</div>
+        <div class="menu-item">Panel firmy</div>
+        <div class="menu-item">Fakturowanie</div>
+      </div>
 
-  $('#btnSave').onclick = () => {
-    setBase(backendInput.value || '');
-    healthStatus.textContent = 'Stan: zapisano';
-    setTimeout(()=>healthStatus.textContent='Stan: nieznany', 1200);
-  };
+      <div class="menu-section">
+        <div class="menu-title">Wsparcie i Ustawienia</div>
+        <div class="menu-item">FAQ / pomoc</div>
+        <div class="menu-item">Ustawienia aplikacji</div>
+        <div class="menu-item">Język / waluta</div>
+      </div>
+    </aside>
+  </div>
 
-  $('#btnPing').onclick = async () => {
-    const base = getBase();
-    if(!base){ healthStatus.textContent='Stan: brak URL'; return; }
-    healthStatus.textContent = 'Sprawdzam…';
-    try{
-      const r = await fetch(base.replace(/\/$/,'') + '/api/health', {mode:'cors'});
-      if(r.ok){ healthStatus.textContent='Stan: OK ✅'; }
-      else { healthStatus.textContent='Stan: błąd ('+r.status+')'; }
-    }catch(e){
-      healthStatus.textContent='Stan: błąd';
+  <script>
+    // ====== Utilities ======
+    const $ = sel => document.querySelector(sel);
+    const backendUrlInput = $('#backendUrl');
+    const healthState = $('#healthState');
+    const promptEl = $('#prompt');
+    const answerEl = $('#answer');
+
+    // Persist backend URL
+    const LS_KEY = 'freeflow.backendUrl';
+    function loadUrl(){
+      const stored = localStorage.getItem(LS_KEY);
+      if(stored) backendUrlInput.value = stored;
     }
-  };
-
-  /* -------- Drawer -------- */
-  $('#btnMenu').onclick = () => drawer.showModal();
-  $('#btnCloseDrawer').onclick = () => drawer.close();
-
-  /* -------- GPT call -------- */
-  async function callGPT(text){
-    const base = getBase();
-    if(!base){ replyEl.value='[BŁĄD] Ustaw URL backendu.'; return; }
-    replyEl.value='Wysyłam…';
-    try{
-      const r = await fetch(base.replace(/\/$/,'') + '/api/gpt', {
-        method:'POST',
-        headers:{'content-type':'application/json'},
-        body:JSON.stringify({ prompt: text })
-      });
-      const data = await r.json().catch(()=> ({}));
-      replyEl.value = data.reply || '[OK] Brak treści odpowiedzi.';
-    }catch(e){
-      replyEl.value = '[BŁĄD] ' + (e?.message || 'Nieznany błąd');
+    function saveUrl(){
+      const val = (backendUrlInput.value || '').trim();
+      if(!val){ alert('Podaj URL backendu (https://…vercel.app)'); return; }
+      localStorage.setItem(LS_KEY, val);
+      toast('Zapisano URL backendu.');
     }
-  }
-  $('#btnCall').onclick = () => callGPT(promptEl.value.trim() || micText.value.trim());
-  $('#btnClear').onclick = () => { promptEl.value=''; replyEl.value=''; };
 
-  /* -------- TTS (odtwórz odpowiedź) -------- */
-  async function speak(text){
-    const base = getBase();
-    if(!text){ return; }
-    if(base){
+    // Simple toast
+    let toastTm;
+    function toast(msg){
+      clearTimeout(toastTm);
+      let t = document.getElementById('toast');
+      if(!t){
+        t = document.createElement('div'); t.id='toast';
+        t.style.cssText = 'position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#101725;color:#e8edf7;border:1px solid rgba(255,255,255,.1);padding:10px 14px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.35);z-index:9999';
+        document.body.appendChild(t);
+      }
+      t.textContent = msg; t.style.opacity = '1';
+      toastTm = setTimeout(()=> t.style.opacity = '0', 1800);
+    }
+
+    // Health check
+    async function pingHealth(){
+      const base = backendUrlInput.value.trim();
+      if(!base) return toast('Ustaw URL backendu.');
+      healthState.textContent = 'sprawdzam…';
       try{
-        const r = await fetch(base.replace(/\/$/,'') + '/api/tts', {
-          method:'POST',
-          headers:{},
-          body: (() => {
-            const fd = new FormData();
-            fd.append('text', text);
-            return fd;
-          })()
-        });
-        if(!r.ok){ throw new Error('HTTP '+r.status); }
-        const blob = await r.blob();
-        const url = URL.createObjectURL(blob);
-        const audio = new Audio(url);
-        audio.play().then(()=> URL.revokeObjectURL(url));
-        return;
+        const r = await fetch(base.replace(/\/$/,'') + '/api/health', {headers:{'accept':'application/json'}});
+        const ok = r.ok;
+        healthState.textContent = ok ? 'OK' : 'błąd';
+        healthState.className = ok ? 'ok' : 'bad';
       }catch(e){
-        // fallback
+        healthState.textContent = 'błąd'; healthState.className='bad';
       }
     }
-    // Fallback na SpeechSynthesis (bez sieci)
-    if('speechSynthesis' in window){
-      const u = new SpeechSynthesisUtterance(text);
+
+    // GPT call
+    async function sendPrompt(){
+      const base = backendUrlInput.value.trim();
+      if(!base) return toast('Ustaw URL backendu.');
+      const prompt = promptEl.value.trim();
+      if(!prompt) return toast('Wpisz wiadomość.');
+      answerEl.value = '…';
+      try{
+        const r = await fetch(base.replace(/\/$/,'') + '/api/gpt', {
+          method:'POST',
+          headers:{'content-type':'application/json','accept':'application/json'},
+          body: JSON.stringify({ prompt })
+        });
+        const data = await r.json().catch(()=> ({}));
+        const text = (data.reply || data.text || JSON.stringify(data, null, 2) || '').toString();
+        answerEl.value = text || '[brak odpowiedzi]';
+      }catch(e){
+        answerEl.value = '❌ Błąd żądania: ' + e.message;
+      }
+    }
+
+    // TTS – Web Speech Synthesis (lokalnie, bez watermarków)
+    function speak(){
+      const txt = (answerEl.value || promptEl.value || '').trim();
+      if(!txt) return toast('Brak treści do odtworzenia.');
+      if(!('speechSynthesis' in window)) return toast('TTS niedostępny w tej przeglądarce.');
+      const u = new SpeechSynthesisUtterance(txt);
       u.lang = 'pl-PL';
+      u.rate = 1.0; u.pitch = 1.0;
+      speechSynthesis.cancel();
       speechSynthesis.speak(u);
     }
-  }
-  $('#btnSpeak').onclick = () => speak(replyEl.value.trim());
 
-  /* -------- Recording (MediaRecorder) -------- */
-  let media, recorder, chunks = [];
-  function setRecUI(active){
-    recDot.style.background = active ? '#ef4444' : '#3b82f6';
-    btnRec.disabled = active;
-    btnStop.disabled = !active;
-  }
-
-  btnRec.onclick = async () => {
-    try{
-      media = await navigator.mediaDevices.getUserMedia({audio:true});
-      recorder = new MediaRecorder(media, {mimeType:'audio/webm'});
-      chunks = [];
-      recorder.ondataavailable = (e)=> { if(e.data?.size) chunks.push(e.data); };
-      recorder.onstop = async () => {
-        setRecUI(false);
-        try{
-          const blob = new Blob(chunks, {type:'audio/webm'});
-          chunks = [];
-          // wyślij do backendu jako /api/gpt (audio)
-          const base = getBase();
-          if(!base){ replyEl.value='[BŁĄD] Ustaw URL backendu.'; return; }
-          const fd = new FormData();
-          fd.append('audio', blob, 'recording.webm');
-          const r = await fetch(base.replace(/\/$/,'') + '/api/gpt', { method:'POST', body:fd });
-          const data = await r.json().catch(()=> ({}));
-          replyEl.value = data.reply || '[OK] Audio wysłane, odpowiedź brak.';
-        }catch(err){
-          replyEl.value = '[BŁĄD audio] ' + (err?.message||'');
-        }finally{
-          media.getTracks().forEach(t=>t.stop());
-        }
-      };
-      recorder.start();
-      setRecUI(true);
-    }catch(e){
-      replyEl.value = '[BŁĄD mikrofonu] ' + (e?.message||'Odmowa dostępu');
+    // Nagrywanie (MediaRecorder -> opcjonalny upload do /api/transcribe jeśli istnieje)
+    let mediaRec, chunks=[];
+    async function startRec(){
+      try{
+        const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+        mediaRec = new MediaRecorder(stream, {mimeType:'audio/webm'});
+        chunks = [];
+        mediaRec.ondataavailable = e => e.data.size && chunks.push(e.data);
+        mediaRec.onstop = async () => {
+          const blob = new Blob(chunks, {type:'audio/webm'}); //  ~50–100 KB / parę sekund
+          // Opcjonalnie wyślij do /api/transcribe, jeśli endpoint jest w backendzie:
+          const base = (backendUrlInput.value || '').trim();
+          if(!base){ toast('Audio nagrane. Ustaw URL backendu, aby wysłać.'); return; }
+          try{
+            const r = await fetch(base.replace(/\/$/,'') + '/api/transcribe', {
+              method:'POST',
+              body: (()=>{ const fd = new FormData(); fd.append('file', blob, 'voice.webm'); return fd; })()
+            });
+            if(r.ok){
+              const data = await r.json().catch(()=> ({}));
+              const txt = data.text || data.transcript || '';
+              if(txt){ promptEl.value = txt; toast('Rozpoznano mowę.'); }
+              else toast('Audio wysłane, odpowiedź brak.');
+            }else{
+              toast('Endpoint /api/transcribe niedostępny (to tylko opcja).');
+            }
+          }catch{ toast('Nie udało się wysłać audio.'); }
+        };
+        mediaRec.start();
+        $('#recBtn').disabled = true; $('#stopBtn').disabled = false;
+        toast('Nagrywanie…');
+      }catch(e){
+        toast('Brak dostępu do mikrofonu.');
+      }
     }
-  };
+    function stopRec(){
+      if(mediaRec && mediaRec.state !== 'inactive'){ mediaRec.stop(); }
+      $('#recBtn').disabled = false; $('#stopBtn').disabled = true;
+    }
 
-  btnStop.onclick = () => {
-    if(recorder && recorder.state!=='inactive'){ recorder.stop(); }
-  };
+    // Drawer
+    const drawer = $('#drawer');
+    function openDrawer(){ drawer.classList.add('open'); drawer.setAttribute('aria-hidden','false'); }
+    function closeDrawer(){ drawer.classList.remove('open'); drawer.setAttribute('aria-hidden','true'); }
 
-  /* Górny “Wyślij” nad miksem */
-  btnSendTop.onclick = () => callGPT(micText.value.trim() || promptEl.value.trim());
+    // Wire events
+    loadUrl();
+    $('#saveUrl').addEventListener('click', saveUrl);
+    $('#pingBtn').addEventListener('click', pingHealth);
+    $('#sendBtn').addEventListener('click', sendPrompt);
+    $('#clearBtn').addEventListener('click', ()=>{ promptEl.value=''; answerEl.value=''; });
+    $('#ttsBtn').addEventListener('click', speak);
+    $('#recBtn').addEventListener('click', startRec);
+    $('#stopBtn').addEventListener('click', stopRec);
+    $('#hamburger').addEventListener('click', openDrawer);
+    $('#closeDrawer').addEventListener('click', closeDrawer);
+    $('.backdrop').addEventListener('click', closeDrawer);
 
-  /* Prefill backend from LS once */
-  if(!backendInput.value){
-    // opcjonalnie: wpisz swój domyślny
-    // backendInput.value = 'https://freeflow-backend-vercel.vercel.app';
-  }
-})();
-</script>
+    // Auto-ping po starcie (jeśli URL jest ustawiony)
+    if(backendUrlInput.value) pingHealth();
+  </script>
 </body>
 </html>
